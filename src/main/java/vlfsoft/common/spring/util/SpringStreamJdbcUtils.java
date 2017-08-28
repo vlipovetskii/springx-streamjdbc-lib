@@ -8,10 +8,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import javax.annotation.Nonnull;
 
 import vlfsoft.common.jdbc.StreamJdbcQuery;
 
@@ -25,7 +25,7 @@ final public class SpringStreamJdbcUtils {
      */
     public static class StreamResultSetExtractor implements ResultSetExtractor<Void> {
 
-        final StreamResultSetRowExtractor mStreamResultSetRowExtractor;
+        final @Nonnull StreamResultSetRowExtractor mStreamResultSetRowExtractor;
 
         // PROBLEM: JdbcTemplate calls extractData from StreamResultSetExtractor<RowType>, extractData returns Stream<RowType>,
         // JdbcTemplate calls JdbcUtils.closeResultSet(rs); and thus ResulSet is closed before Stream calls method hasNext, next.
@@ -42,7 +42,7 @@ final public class SpringStreamJdbcUtils {
             return null;
         }
 
-        public StreamResultSetExtractor(final StreamResultSetRowExtractor aStreamResultSetRowExtractor) {
+        public StreamResultSetExtractor(final @Nonnull StreamResultSetRowExtractor aStreamResultSetRowExtractor) {
             mStreamResultSetRowExtractor = aStreamResultSetRowExtractor;
         }
 
@@ -66,7 +66,7 @@ final public class SpringStreamJdbcUtils {
      * To avoid dependencies doubled this method from vlfsoft.common.nui.rxjdbc.RxJdbcQuery
      */
     public static Timestamp getTimestamp(Optional<LocalDateTime> aLocalDateTime) throws SQLException {
-        return Timestamp.valueOf(aLocalDateTime.orElse(null));
+        return aLocalDateTime.map(Timestamp::valueOf).orElse(null);
     }
 
     public static Timestamp getTimestamp(LocalDateTime aLocalDateTime) throws SQLException {
